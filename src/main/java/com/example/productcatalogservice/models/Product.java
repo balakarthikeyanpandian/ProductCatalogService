@@ -1,4 +1,4 @@
-package com.example.productcatalogservice_dec2024.models;
+package com.example.productcatalogservice.models;
 
 import lombok.Getter;
 import lombok.Setter;
