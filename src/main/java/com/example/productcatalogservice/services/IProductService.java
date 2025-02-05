@@ -5,4 +5,5 @@ import com.example.productcatalogservice.models.Product;
 
 public interface IProductService {
     Product getProductDetails(Long productId);
+    Product save(Product product);
 }
