@@ -44,13 +44,13 @@ public class ProductController {
         headers.add("copy-right","2025");
 
         if(id<=0){
-            return new ResponseEntity<>(null, headers,  HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ProductDto(), headers,  HttpStatus.NOT_FOUND);
         }
-        Product product = new Product();
-        product = productService.getProductDetails(id);
+
+        Product product = productService.getProductDetails(id);
 
         if(product == null){
-            return new ResponseEntity<>(null, headers, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ProductDto(), headers, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(from(product), headers, HttpStatus.OK);
 
@@ -95,9 +95,9 @@ public class ProductController {
         if(output !=null)
             return new ResponseEntity<>(from(output), headers, HttpStatus.OK);
 
-        return new ResponseEntity<>(null, headers, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ProductDto(), headers, HttpStatus.BAD_REQUEST);
 
-        //check from fakestoreapi
+        //check from fake store api
 
     }
 
