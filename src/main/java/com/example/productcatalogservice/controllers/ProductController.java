@@ -97,7 +97,7 @@ public class ProductController {
 
         return new ResponseEntity<>(null, headers, HttpStatus.BAD_REQUEST);
 
-        //check
+        //check from fakestoreapi
 
     }
 
