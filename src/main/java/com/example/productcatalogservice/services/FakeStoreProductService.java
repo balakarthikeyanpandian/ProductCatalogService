@@ -6,9 +6,14 @@ import com.example.productcatalogservice.models.Category;
 import com.example.productcatalogservice.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -68,6 +73,32 @@ public class FakeStoreProductService implements IProductService{
 
         return null;
     }
+
+    @Override
+    public Product replaceProduct(Long id, Product product) {
+
+        FakeStoreProductDto fakeStoreProductDto = from(product);
+
+        ResponseEntity<FakeStoreProductDto> responseEntity =
+                requestForEntity("https://fakestoreapi.com/products/{productID}",HttpMethod.PUT,fakeStoreProductDto,FakeStoreProductDto.class,id);
+
+        if(responseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200))){
+            FakeStoreProductDto fakeStoreProductDto1 = responseEntity.getBody();
+            return from(fakeStoreProductDto1);
+        }
+
+        return null;
+    }
+
+    // Common Rest Template
+    private <T> ResponseEntity<T> requestForEntity(String url, HttpMethod httpMethod, @Nullable Object request, Class<T> responseType, Object... uriVariables) throws RestClientException {
+        RestTemplate restTemplate = restTemplateBuilder.build();
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(request, responseType);
+        ResponseExtractor<ResponseEntity<T>> responseExtractor = restTemplate.responseEntityExtractor(responseType);
+        return restTemplate.execute(url, httpMethod, requestCallback, responseExtractor, uriVariables);
+    }
+    // Common Rest Template
+
 
     // Mappers
     private FakeStoreProductDto from(Product product){

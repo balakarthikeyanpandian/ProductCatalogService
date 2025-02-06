@@ -6,12 +6,18 @@ import com.example.productcatalogservice.models.Category;
 import com.example.productcatalogservice.models.Product;
 import com.example.productcatalogservice.services.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +62,6 @@ public class ProductController {
 
     }
 
-
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto){
 
@@ -74,6 +79,17 @@ public class ProductController {
         //check from fake store api
 
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductDto> replaceProduct(@PathVariable Long id, @RequestBody ProductDto productDto){
+
+        ProductDto productDtoResponse =  from(productService.replaceProduct(id,from(productDto)));
+        return new ResponseEntity<>(productDtoResponse,HttpStatus.OK);
+
+    }
+
+
+
 
     // Mappers
     private ProductDto from(Product product){
