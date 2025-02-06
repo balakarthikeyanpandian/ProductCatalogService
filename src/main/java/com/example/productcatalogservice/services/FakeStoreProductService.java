@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class FakeStoreProductService implements IProductService{
 
@@ -34,8 +37,6 @@ public class FakeStoreProductService implements IProductService{
 
         RestTemplate restTemplate = restTemplateBuilder.build();
 
-
-
         ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = restTemplate.postForEntity("https://fakestoreapi.com/products",from(product),FakeStoreProductDto.class);
 
         if(fakeStoreProductDtoResponseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200))){
@@ -45,6 +46,30 @@ public class FakeStoreProductService implements IProductService{
         return null;
     }
 
+    @Override
+    public List<Product> getAllProductDetails() {
+
+        RestTemplate restTemplate = restTemplateBuilder.build();
+        List<Product> products = new ArrayList<>();
+
+        ResponseEntity<FakeStoreProductDto[]> fakeStoreProductDtoResponseEntity =
+                restTemplate.getForEntity("https://fakestoreapi.com/products/",FakeStoreProductDto[].class);
+
+        if(fakeStoreProductDtoResponseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200))){
+            List<FakeStoreProductDto> fakeStoreProductDtoList = new ArrayList<>();
+
+            for(FakeStoreProductDto fakeStoreProductDto : fakeStoreProductDtoResponseEntity.getBody()){
+                products.add(from(fakeStoreProductDto));
+            }
+
+            return products;
+
+        }
+
+        return null;
+    }
+
+    // Mappers
     private FakeStoreProductDto from(Product product){
 
         FakeStoreProductDto fakeStoreProductDto = new FakeStoreProductDto();
@@ -71,5 +96,7 @@ public class FakeStoreProductService implements IProductService{
         product.setImageURL(fakeStoreProductDto.getImage());
         return product;
     }
+    // Mappers
+
 
 }

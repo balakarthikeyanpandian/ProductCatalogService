@@ -24,16 +24,16 @@ public class ProductController {
     IProductService productService;
 
     @GetMapping
-    public List<Product> getAllProducts(){
+    public ResponseEntity<List<ProductDto>> getAllProducts(){
 
-        Product product1 = new Product();
-        product1.setId(1L);
-        product1.setDescription("Phone");
-        product1.setName("Iphone 16");
+        List<ProductDto> productDtos = new ArrayList<>();
 
-        List<Product> productList = new ArrayList<>();
-        productList.add(product1);
-        return productList;
+        List<Product> products = productService.getAllProductDetails();
+
+        for(Product product : products){
+            productDtos.add(from(product));
+        }
+        return new ResponseEntity<>(productDtos,HttpStatus.OK);
 
     }
 
@@ -56,6 +56,26 @@ public class ProductController {
 
     }
 
+
+    @PostMapping
+    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto){
+
+        LinkedMultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
+
+        headers.add("product-creation","yes");
+
+        Product input = from(productDto);
+        Product output = productService.save(input);
+        if(output !=null)
+            return new ResponseEntity<>(from(output), headers, HttpStatus.OK);
+
+        return new ResponseEntity<>(new ProductDto(), headers, HttpStatus.BAD_REQUEST);
+
+        //check from fake store api
+
+    }
+
+    // Mappers
     private ProductDto from(Product product){
 
         ProductDto productDto = new ProductDto();
@@ -83,25 +103,6 @@ public class ProductController {
 
     }
 
-    @PostMapping
-    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto){
-
-        LinkedMultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
-
-        headers.add("product-creation","yes");
-
-        Product input = from(productDto);
-        Product output = productService.save(input);
-        if(output !=null)
-            return new ResponseEntity<>(from(output), headers, HttpStatus.OK);
-
-        return new ResponseEntity<>(new ProductDto(), headers, HttpStatus.BAD_REQUEST);
-
-        //check from fake store api
-
-    }
-
-
     private Product from(ProductDto productDto){
 
         Product product = new Product();
@@ -125,4 +126,6 @@ public class ProductController {
         return product;
 
     }
+    // Mappers
+
 }
