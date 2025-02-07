@@ -14,6 +14,10 @@ import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 @Component
 public class FakeStoreApiClient {
 
@@ -28,6 +32,49 @@ public class FakeStoreApiClient {
 
         return validateResponseEntity(fakeStoreProductDtoResponseEntity);
 
+    }
+
+    public FakeStoreProductDto saveProduct(FakeStoreProductDto fakeStoreProductDto){
+
+        ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity =
+                requestForEntity("https://fakestoreapi.com/products",
+                        HttpMethod.POST,fakeStoreProductDto,FakeStoreProductDto.class);
+
+        return validateResponseEntity(fakeStoreProductDtoResponseEntity);
+
+    }
+
+    public List<FakeStoreProductDto> getAllProductDetails() {
+
+        List<FakeStoreProductDto> fakeStoreProductDto = new ArrayList<>();
+
+        ResponseEntity<FakeStoreProductDto[]> fakeStoreProductDtoResponseEntity =
+                requestForEntity("https://fakestoreapi.com/products",
+                        HttpMethod.GET,null,FakeStoreProductDto[].class);
+
+        fakeStoreProductDto  = List.of(Objects.requireNonNull(validateResponseEntityForArray(fakeStoreProductDtoResponseEntity)));
+
+        return fakeStoreProductDto;
+
+    }
+
+    public FakeStoreProductDto replaceProduct(Long id, FakeStoreProductDto fakeStoreProductDto) {
+
+        ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity =
+                requestForEntity("https://fakestoreapi.com/products/{id}",
+                        HttpMethod.PUT,fakeStoreProductDto,FakeStoreProductDto.class,id);
+
+        return validateResponseEntity(fakeStoreProductDtoResponseEntity);
+
+    }
+
+    private FakeStoreProductDto[] validateResponseEntityForArray(ResponseEntity<FakeStoreProductDto[]> fakeStoreProductDtoResponseEntity){
+
+        if(fakeStoreProductDtoResponseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200))){
+            return fakeStoreProductDtoResponseEntity.getBody();
+        }
+
+        return null;
     }
 
     private FakeStoreProductDto validateResponseEntity(ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity){

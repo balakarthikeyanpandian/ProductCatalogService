@@ -70,7 +70,7 @@ public class ProductController {
         headers.add("product-creation","yes");
 
         Product input = from(productDto);
-        Product output = productService.save(input);
+        Product output = productService.saveProduct(input);
         if(output !=null)
             return new ResponseEntity<>(from(output), headers, HttpStatus.OK);
 

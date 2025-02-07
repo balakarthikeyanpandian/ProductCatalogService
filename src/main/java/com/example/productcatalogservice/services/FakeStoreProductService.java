@@ -24,77 +24,60 @@ import java.util.List;
 public class FakeStoreProductService implements IProductService{
 
     @Autowired
-    private RestTemplateBuilder restTemplateBuilder;
-
-    @Autowired
     FakeStoreApiClient fakeStoreApiClient;
 
     public Product getProductDetails(Long productId){
 
-        FakeStoreProductDto fakeStoreProductDto;
-        fakeStoreProductDto = fakeStoreApiClient.getProductDetails(productId);
+        FakeStoreProductDto fakeStoreProductDto = fakeStoreApiClient.getProductDetails(productId);
 
+        return returnAsProduct(fakeStoreProductDto);
+    }
+
+    public Product saveProduct(Product product){
+
+        FakeStoreProductDto fakeStoreProductDto = fakeStoreApiClient.saveProduct(from(product));
+
+        return returnAsProduct(fakeStoreProductDto);
+
+    }
+
+    public List<Product> getAllProductDetails() {
+
+        List<FakeStoreProductDto> fakeStoreProductDto = fakeStoreApiClient.getAllProductDetails();
+
+        return returnAsProductList(fakeStoreProductDto);
+
+    }
+
+
+    public Product replaceProduct(Long id, Product product) {
+
+        FakeStoreProductDto fakeStoreProductDto = fakeStoreApiClient.replaceProduct(id,from(product));
+
+        return returnAsProduct(fakeStoreProductDto);
+    }
+
+
+    private Product returnAsProduct(FakeStoreProductDto fakeStoreProductDto){
         if(fakeStoreProductDto!=null){
             return from(fakeStoreProductDto);
         }
-
         return null;
     }
 
-    public Product save(Product product){
+    private List<Product> returnAsProductList(List<FakeStoreProductDto> fakeStoreProductDto){
 
-        RestTemplate restTemplate = restTemplateBuilder.build();
-
-        ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = restTemplate.postForEntity("https://fakestoreapi.com/products",from(product),FakeStoreProductDto.class);
-
-        if(fakeStoreProductDtoResponseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200))){
-            return from(fakeStoreProductDtoResponseEntity.getBody());
-        }
-
-        return null;
-    }
-
-    @Override
-    public List<Product> getAllProductDetails() {
-
-        RestTemplate restTemplate = restTemplateBuilder.build();
         List<Product> products = new ArrayList<>();
 
-        ResponseEntity<FakeStoreProductDto[]> fakeStoreProductDtoResponseEntity =
-                restTemplate.getForEntity("https://fakestoreapi.com/products/",FakeStoreProductDto[].class);
+        if(fakeStoreProductDto==null)
+            return null;
 
-        if(fakeStoreProductDtoResponseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200))){
-            List<FakeStoreProductDto> fakeStoreProductDtoList = new ArrayList<>();
-
-            for(FakeStoreProductDto fakeStoreProductDto : fakeStoreProductDtoResponseEntity.getBody()){
-                products.add(from(fakeStoreProductDto));
-            }
-
-            return products;
-
+        for(FakeStoreProductDto fakeStoreProductDto1 : fakeStoreProductDto){
+            products.add(from(fakeStoreProductDto1));
         }
 
-        return null;
+        return products;
     }
-
-    @Override
-    public Product replaceProduct(Long id, Product product) {
-
-        FakeStoreProductDto fakeStoreProductDto = from(product);
-
-//        ResponseEntity<FakeStoreProductDto> responseEntity =
-//                requestForEntity("https://fakestoreapi.com/products/{productID}",HttpMethod.PUT,fakeStoreProductDto,FakeStoreProductDto.class,id);
-//
-//        if(responseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200))){
-//            FakeStoreProductDto fakeStoreProductDto1 = responseEntity.getBody();
-//            return from(fakeStoreProductDto1);
-//        }
-
-        return null;
-    }
-
-
-
 
     // Mappers
     private FakeStoreProductDto from(Product product){

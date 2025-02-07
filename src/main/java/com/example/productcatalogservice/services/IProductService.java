@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IProductService {
     Product getProductDetails(Long productId);
-    Product save(Product product);
+    Product saveProduct(Product product);
     List<Product> getAllProductDetails();
     Product replaceProduct(Long id, Product product);
 }
