@@ -1,5 +1,6 @@
 package com.example.productcatalogservice.services;
 
+import com.example.productcatalogservice.clients.FakeStoreApiClient;
 import com.example.productcatalogservice.dtos.FakeStoreProductDto;
 import com.example.productcatalogservice.dtos.ProductDto;
 import com.example.productcatalogservice.models.Category;
@@ -25,14 +26,16 @@ public class FakeStoreProductService implements IProductService{
     @Autowired
     private RestTemplateBuilder restTemplateBuilder;
 
+    @Autowired
+    FakeStoreApiClient fakeStoreApiClient;
+
     public Product getProductDetails(Long productId){
 
-        RestTemplate restTemplate = restTemplateBuilder.build();
+        FakeStoreProductDto fakeStoreProductDto;
+        fakeStoreProductDto = fakeStoreApiClient.getProductDetails(productId);
 
-        ResponseEntity<FakeStoreProductDto>  fakeStoreProductDtoResponseEntity = restTemplate.getForEntity("https://fakestoreapi.com/products/{productID}",FakeStoreProductDto.class,productId);
-
-        if(fakeStoreProductDtoResponseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200)) && fakeStoreProductDtoResponseEntity.getBody() != null){
-            return from(fakeStoreProductDtoResponseEntity.getBody());
+        if(fakeStoreProductDto!=null){
+            return from(fakeStoreProductDto);
         }
 
         return null;
@@ -79,25 +82,18 @@ public class FakeStoreProductService implements IProductService{
 
         FakeStoreProductDto fakeStoreProductDto = from(product);
 
-        ResponseEntity<FakeStoreProductDto> responseEntity =
-                requestForEntity("https://fakestoreapi.com/products/{productID}",HttpMethod.PUT,fakeStoreProductDto,FakeStoreProductDto.class,id);
-
-        if(responseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200))){
-            FakeStoreProductDto fakeStoreProductDto1 = responseEntity.getBody();
-            return from(fakeStoreProductDto1);
-        }
+//        ResponseEntity<FakeStoreProductDto> responseEntity =
+//                requestForEntity("https://fakestoreapi.com/products/{productID}",HttpMethod.PUT,fakeStoreProductDto,FakeStoreProductDto.class,id);
+//
+//        if(responseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200))){
+//            FakeStoreProductDto fakeStoreProductDto1 = responseEntity.getBody();
+//            return from(fakeStoreProductDto1);
+//        }
 
         return null;
     }
 
-    // Common Rest Template
-    private <T> ResponseEntity<T> requestForEntity(String url, HttpMethod httpMethod, @Nullable Object request, Class<T> responseType, Object... uriVariables) throws RestClientException {
-        RestTemplate restTemplate = restTemplateBuilder.build();
-        RequestCallback requestCallback = restTemplate.httpEntityCallback(request, responseType);
-        ResponseExtractor<ResponseEntity<T>> responseExtractor = restTemplate.responseEntityExtractor(responseType);
-        return restTemplate.execute(url, httpMethod, requestCallback, responseExtractor, uriVariables);
-    }
-    // Common Rest Template
+
 
 
     // Mappers
