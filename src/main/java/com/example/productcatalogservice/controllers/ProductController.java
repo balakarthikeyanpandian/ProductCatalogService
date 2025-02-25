@@ -46,19 +46,25 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> findProductById(@PathVariable("id") Long id){
 
-        LinkedMultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
-        headers.add("copy-right","2025");
+        try{
+            LinkedMultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
+            headers.add("copy-right","2025");
 
-        if(id<=0){
-            return new ResponseEntity<>(new ProductDto(), headers,  HttpStatus.NOT_FOUND);
+            if(id<=0){
+//                return new ResponseEntity<>(new ProductDto(), headers,  HttpStatus.NOT_FOUND);
+                throw new IllegalArgumentException("Please try with value greater than 0");
+            }
+
+            Product product = productService.getProductDetails(id);
+
+            if(product == null){
+                return new ResponseEntity<>(new ProductDto(), headers, HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(from(product), headers, HttpStatus.OK);
+        }catch (IllegalArgumentException exception){
+            throw exception;
         }
 
-        Product product = productService.getProductDetails(id);
-
-        if(product == null){
-            return new ResponseEntity<>(new ProductDto(), headers, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(from(product), headers, HttpStatus.OK);
 
     }
 
