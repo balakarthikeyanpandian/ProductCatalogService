@@ -4,6 +4,7 @@ import com.example.productcatalogservice.dtos.CategoryDto;
 import com.example.productcatalogservice.dtos.ProductDto;
 import com.example.productcatalogservice.models.Category;
 import com.example.productcatalogservice.models.Product;
+import com.example.productcatalogservice.models.State;
 import com.example.productcatalogservice.services.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -20,6 +21,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -76,6 +78,16 @@ public class ProductController {
         headers.add("product-creation","yes");
 
         Product input = from(productDto);
+        input.setCreatedAt(new Date());
+        input.setLastUpdateAt(new Date());
+        input.setState(State.ACTIVE);
+
+        Category category = input.getCategory();
+        category.setCreatedAt(new Date());
+        category.setLastUpdateAt(new Date());
+
+        input.setCategory(category);
+
         Product output = productService.saveProduct(input);
         if(output !=null)
             return new ResponseEntity<>(from(output), headers, HttpStatus.OK);
@@ -89,7 +101,16 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> replaceProduct(@PathVariable Long id, @RequestBody ProductDto productDto){
 
-        ProductDto productDtoResponse =  from(productService.replaceProduct(id,from(productDto)));
+        Product product = from(productDto);
+
+        Category category = product.getCategory();
+
+        product.setLastUpdateAt(new Date());
+        category.setLastUpdateAt(new Date());
+
+        product.setCategory(category);
+
+        ProductDto productDtoResponse =  from(productService.replaceProduct(id,product));
         return new ResponseEntity<>(productDtoResponse,HttpStatus.OK);
 
     }
