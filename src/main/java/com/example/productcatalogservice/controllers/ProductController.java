@@ -51,7 +51,9 @@ public class ProductController {
         try{
             LinkedMultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
             headers.add("copy-right","2025");
-
+            if(id<0){
+                throw new IllegalArgumentException("The product id can not be negative");
+            }
             if(id<=0){
 //                return new ResponseEntity<>(new ProductDto(), headers,  HttpStatus.NOT_FOUND);
                 throw new IllegalArgumentException("Please try with value greater than 0");
@@ -126,7 +128,7 @@ public class ProductController {
 
         productDto.setPrice(product.getPrice());
         productDto.setDescription(product.getDescription());
-        productDto.setIsPrime(true);
+//        productDto.setIsPrime(true);
         productDto.setImageURL(product.getImageURL());
         productDto.setName(product.getName());
         productDto.setPrice(product.getPrice());
