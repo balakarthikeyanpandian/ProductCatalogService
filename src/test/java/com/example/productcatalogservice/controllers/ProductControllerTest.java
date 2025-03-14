@@ -5,6 +5,8 @@ import com.example.productcatalogservice.models.Product;
 import com.example.productcatalogservice.services.IProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,6 +23,9 @@ class ProductControllerTest {
 
     @MockBean
     IProductService productService;
+
+    @Captor
+    private ArgumentCaptor<Long> idCaptor;
 
     @Test
     @DisplayName("Product id as 4 results with the valid product.")
@@ -41,6 +46,7 @@ class ProductControllerTest {
         assertNotNull(responseEntity.getBody());
         assertEquals(productId,responseEntity.getBody().getId());
         assertEquals("Iphone",responseEntity.getBody().getName());
+
         verify(productService,times(1)).getProductDetails(productId);
 
     }
@@ -65,6 +71,24 @@ class ProductControllerTest {
         Exception exception = assertThrows(IllegalArgumentException.class,() -> productController.findProductById(-1L));
         assertEquals("The product id can not be negative",exception.getMessage());
         verify(productService,times(0)).getProductDetails(-1L);
+    }
+
+
+    @Test
+    public void Test_GetProductByIdValueIsPassed_ReachesTheServicesCorrectly(){
+
+        //Arrange
+        long productId = 1L;
+        Product product = new Product();
+        product.setId(productId);
+
+        when(productService.getProductDetails(1L)).thenReturn(product);
+        //Act
+        productController.findProductById(product.getId());
+
+        // Assert
+        verify(productService).getProductDetails(idCaptor.capture());
+        assertEquals(product.getId(),idCaptor.getValue());
     }
 
 }
